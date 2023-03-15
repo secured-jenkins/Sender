@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.jwt.JwtTokenUtil;
 import com.example.model.JwtRequest;
 import com.example.model.JwtResponse;
+import com.example.model.UserT;
+import com.example.services.JwtUserDetailsService;
+import com.example.services.UserService;
 
 @RestController
 	public class AuthController {
@@ -26,11 +29,14 @@ import com.example.model.JwtResponse;
 	private JwtTokenUtil jwtTokenUtil;
 
 	@Autowired
-	private UserDetailsService jwtInMemoryDetailsService;
+	private UserService userService;
 
 	@Autowired
+	private JwtUserDetailsService jwtInMemoryDetailsService;
+	
+	@Autowired
 	private AuthenticationManager authenticationManager;
-
+	
 	@PostMapping(value = "/authenticate")
 	public ResponseEntity<JwtResponse> addEmp(@RequestBody JwtRequest user) {
 		System.out.println("********************** I ENTERED **********************");
@@ -59,5 +65,10 @@ import com.example.model.JwtResponse;
 	public String hi() {
 		System.out.println("heLOO");
 		return "HI";
+	}
+	
+	@PostMapping(path = "/register")
+	public ResponseEntity<Boolean> addUser(@RequestBody UserT user) {
+		return new ResponseEntity<Boolean>(userService.saveNewUser(user), HttpStatus.ACCEPTED);
 	}
 }

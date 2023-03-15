@@ -30,9 +30,6 @@ public class SecurityConfiguration {
 	@Autowired
 	private JwtRequestFilter jwtRequestFilter;
 
-	@Autowired
-	private UserDetailsService jwtUserDetailsService;
-
 	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
 			throws Exception {
@@ -41,7 +38,7 @@ public class SecurityConfiguration {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeHttpRequests().requestMatchers("/authenticate").permitAll()
+		http.csrf().disable().authorizeHttpRequests().requestMatchers("/authenticate", "/register").permitAll()
 				.anyRequest().authenticated().and().
 				// make sure we use stateless session; session won't be used to
 				// store user's state.
