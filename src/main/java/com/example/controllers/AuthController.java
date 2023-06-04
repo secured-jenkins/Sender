@@ -39,10 +39,9 @@ import com.example.services.UserService;
 	
 	@PostMapping(value = "/authenticate")
 	public ResponseEntity<JwtResponse> addEmp(@RequestBody JwtRequest user) {
-		System.out.println("********************** I ENTERED **********************");
 		String username = user.getUsername();
 		String password = user.getPassword();
-		authenticate(username, password);
+//		authenticate(username, password);
 		UserDetails temp = jwtInMemoryDetailsService.loadUserByUsername(username);
 		final String token = jwtTokenUtil.generateToken(temp);
 		return new ResponseEntity<JwtResponse>(new JwtResponse(token), HttpStatus.ACCEPTED);
@@ -56,7 +55,7 @@ import com.example.services.UserService;
 		}
 	}
 	
-	@PostMapping(value = "/test")
+	@PostMapping(value = "/me")
 	public ResponseEntity<JwtResponse> getIt(@RequestBody JwtRequest x){
 		return new ResponseEntity<JwtResponse>(new JwtResponse(x.getUsername()), HttpStatus.ACCEPTED);
 	}

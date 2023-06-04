@@ -42,7 +42,8 @@ public class SecurityConfiguration {
 				.anyRequest().authenticated().and().
 				// make sure we use stateless session; session won't be used to
 				// store user's state.
-				exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+//				exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().
+				sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
