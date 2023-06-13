@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,5 +34,10 @@ public class AuthController {
 	@PostMapping(path = "/register")
 	public ResponseEntity<EmployeeDTO> addUser(@RequestBody EmployeeDTO employee) {
 		return new ResponseEntity<EmployeeDTO>(empService.addEmployee(employee), HttpStatus.CREATED);
+	}
+	
+	@GetMapping("/continue")
+	public void catchForward(OAuth2AuthenticationToken token) {
+		System.out.println(token);
 	}
 }
