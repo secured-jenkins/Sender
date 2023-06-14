@@ -15,7 +15,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import com.example.persistence.CarRepo;
 import com.example.persistence.entities.Car;
 
-@ComponentScan({ "com.example.controllers", "com.example.jwt", "com.example.services", "com.example.security" })
+@ComponentScan({ "com.example.controllers", "com.example.jwt", "com.example.services", "com.example.security", "com.example.configurations"})
 @EntityScan({ "com.example.persistence.entities" })
 @EnableJpaRepositories("com.example.persistence")
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
