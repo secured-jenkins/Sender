@@ -7,13 +7,23 @@ pipeline {
         stage('set environment') {
             steps{
                 bat 'docker start sqlServerV'
-                // another approach is to pull mysql image then run it configured to work with the application
+                //the sqlServerV container should be running on the network 'com'
             }
         }
         stage('project build') {
             steps {
-                checkout scmGit(branches: [[name: '*/latest']], browser: github('https://github.com/secured-jenkins/Sender.git'), extensions: [], userRemoteConfigs: [[url: 'https://github.com/secured-jenkins/Sender.git']])
-                bat 'mvn clean install'
+                script{
+                    checkout scmGit(branches: [[name: '*/latest']], browser: github('https://github.com/secured-jenkins/Sender.git'), extensions: [], userRemoteConfigs: [[url: 'https://github.com/secured-jenkins/Sender.git']])
+                    def numOfRetry = 0;
+                    retry(2) {
+                        if(numOfRetry > 0){
+                            sleep (20);
+                        }
+                        numOfRetry = numOfRetry + 1;
+                        bat 'mvn clean install -P test'
+                    
+                    }
+                }
             }
         }
         stage('dockerize'){
@@ -29,7 +39,7 @@ pipeline {
         }
         stage('start Application'){
             steps{
-                bat 'docker run -d --name newApplication -p 8081:8081 hasanalrimawi/sender-ci:%BUILD_NUMBER%'
+                bat 'docker run -d --name newApplication --network com -p 8081:8081 hasanalrimawi/sender-ci:%BUILD_NUMBER%'
             }
         }
     }
