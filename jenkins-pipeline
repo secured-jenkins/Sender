@@ -1,0 +1,36 @@
+pipeline {
+    agent any
+    tools{
+        maven 'maven'
+    }
+    stages {
+        stage('set environment') {
+            steps{
+                bat 'docker start sqlServerV'
+                // another approach is to pull mysql image then run it configured to work with the application
+            }
+        }
+        stage('project build') {
+            steps {
+                checkout scmGit(branches: [[name: '*/latest']], browser: github('https://github.com/secured-jenkins/Sender.git'), extensions: [], userRemoteConfigs: [[url: 'https://github.com/secured-jenkins/Sender.git']])
+                bat 'mvn clean install'
+            }
+        }
+        stage('dockerize'){
+            steps{
+                bat 'docker build --tag hasanalrimawi/sender-ci:%BUILD_NUMBER% .'
+            }
+        }
+        stage('push image'){
+            steps{
+                bat 'docker push hasanalrimawi/sender-ci:%BUILD_NUMBER%'
+                // bat 'docker stop sqlServerV'
+            }
+        }
+        stage('start Application'){
+            steps{
+                bat 'docker run -d --name newApplication -p 8081:8081 hasanalrimawi/sender-ci:%BUILD_NUMBER%'
+            }
+        }
+    }
+}
