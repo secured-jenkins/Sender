@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.example.persistence.entities.OAuthUser;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -57,6 +59,11 @@ public class JwtTokenUtil implements Serializable{
 		Map<String, Object> claims = new HashMap<String, Object>();
 		return doGenerateToken(claims, userDetails.getUsername());
 	}
+	
+	public String generateTokenSocialLogin(OAuthUser user) {
+		Map<String, Object> claims = new HashMap<String, Object>();
+		return doGenerateToken(claims, user.getName());
+	}
 
 	private String doGenerateToken(Map<String, Object> claims, String subject) {
 
@@ -72,5 +79,10 @@ public class JwtTokenUtil implements Serializable{
 	public Boolean validateToken(String token, UserDetails userDetails) {
 		final String username = getUsernameFromToken(token);
 		return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+	}
+	
+	public Boolean validateSocialLoginToken(String token, OAuthUser user) {
+		final String username = getUsernameFromToken(token);
+		return (username.equals(user.getName()) && !isTokenExpired(token));
 	}
 }

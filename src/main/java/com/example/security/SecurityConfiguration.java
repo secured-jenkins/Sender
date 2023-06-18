@@ -57,17 +57,17 @@ public class SecurityConfiguration {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeHttpRequests().requestMatchers("/authenticate", "/register", "/login/oauth2/code/google").permitAll()
-				.anyRequest().authenticated().and().
-				// make sure we use stateless session; session won't be used to
-				// store user's state.
-		exceptionHandling().authenticationEntryPoint(entryPoint).and().
-				sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-		return http.build();
-
-//		http.authorizeHttpRequests((authz) -> authz.anyRequest().authenticated()).oauth2Login();
+//		http.csrf().disable().authorizeHttpRequests().requestMatchers("/authenticate", "/register", "/login/oauth2/code/google").permitAll()
+//				.anyRequest().authenticated().and().
+//				// make sure we use stateless session; session won't be used to
+//				// store user's state.
+//		exceptionHandling().authenticationEntryPoint(entryPoint).and().
+//				sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 //		return http.build();
+
+		http.authorizeHttpRequests((authz) -> authz.anyRequest().authenticated()).oauth2Login();
+		return http.build();
 	}
 
 	@Bean

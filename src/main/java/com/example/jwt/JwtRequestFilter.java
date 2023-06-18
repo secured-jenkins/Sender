@@ -12,7 +12,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.example.persistence.entities.OAuthUser;
 import com.example.services.EmpService;
+import com.example.services.OAuthUserService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -25,8 +27,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
 	private EmpService empService;
 
-	public JwtRequestFilter(@Lazy EmpService service) {
+	private OAuthUserService oauthUserService;
+
+	public JwtRequestFilter(@Lazy EmpService service, @Lazy OAuthUserService oauthUserService) {
 		this.empService = service;
+		this.oauthUserService = oauthUserService;
 	}
 
 	@Autowired
@@ -59,8 +64,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 		// Once we get the token validate it.
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 			System.out.println("Safe and sound");
-			UserDetails userDetails = this.empService.loadUserByUsername(username);
-
+			UserDetails userDetails = empService.loadUserByUsername(username);
+			OAuthUser socialLoginUser = oauthUserService.loadUserByEmail(username);
 			// if token is valid configure Spring Security to manually set authentication
 			if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
 				System.out.println("token valid");
@@ -72,8 +77,19 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 				// that the current user is authenticated. So it passes the Spring Security
 				// Configurations successfully.
 				SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+			} else if (jwtTokenUtil.validateSocialLoginToken(jwtToken, socialLoginUser)) {
+				System.out.println("token of scoail login valid");
+				OAuth2AuthenticationToken Oauth2AuthToken = new OAuth2AuthenticationToken(socialLoginUser,
+						socialLoginUser.getAuthorities(),
+						"174560673037-53d0ls0dod1mseblb2rivfiaf0ffh0hb.apps.googleusercontent.com");
+				Oauth2AuthToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+				// After setting the Authentication in the context, we specify
+				// that the current user is authenticated. So it passes the Spring Security
+				// Configurations successfully.
+				SecurityContextHolder.getContext().setAuthentication(Oauth2AuthToken);
 			}
 		}
+
 		chain.doFilter(request, response);
 	}
 
