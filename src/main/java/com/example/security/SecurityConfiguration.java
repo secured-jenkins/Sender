@@ -25,12 +25,6 @@ import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationF
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
-import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
-import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -57,12 +51,13 @@ public class SecurityConfiguration {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeHttpRequests().requestMatchers("/authenticate", "/register", "/login/oauth2/code/google").permitAll()
-				.anyRequest().authenticated().and().
+		http.csrf().disable().authorizeHttpRequests()
+				.requestMatchers("/authenticate", "/register", "/login/oauth2/code/google").permitAll()
+				.requestMatchers("/**").hasAuthority("EMPLOYEE").anyRequest().authenticated().and().
 				// make sure we use stateless session; session won't be used to
 				// store user's state.
-		exceptionHandling().authenticationEntryPoint(entryPoint).and().
-				sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+				exceptionHandling().authenticationEntryPoint(entryPoint).and().sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 
